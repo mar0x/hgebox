@@ -1,7 +1,7 @@
 Apple Mail Import Mercurial Extension
 =====================================
 
-This extension allows you to import patches strait from Apple Mail application.
+This extension allows you to import patches straight from Apple Mail.
 
 Get
 ```
