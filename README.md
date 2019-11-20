@@ -20,7 +20,7 @@ EOF
 
 Try
 ---
-Select email(s) with patches and
+In Apple Mail select email(s) with patches and
 ```
 hg eimport -
 ```
