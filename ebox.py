@@ -62,7 +62,14 @@ def importpatches(ui, repo, patches):
 def scanmsg(ui, patches, s, m, suppressWarn=False):
     if m.is_multipart():
         for a in m.get_payload():
-            scanmsg(ui, patches, s, a, suppressWarn=True)
+            if a.get_filename():
+                t = a.get_filename()
+                suppressWarn = False
+            else:
+                t = s
+
+            scanmsg(ui, patches, t, a, suppressWarn)
+            suppressWarn = True
     else:
         a = m.get_payload(decode=True)
 
