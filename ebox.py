@@ -5,6 +5,7 @@ import re
 import os
 import subprocess
 import tempfile
+import shutil
 from mercurial import commands, hg, util, extensions
 from mercurial.i18n import gettext, _
 
@@ -58,6 +59,21 @@ def importpatches(ui, repo, patches):
         imported.append(name)
     ui.status(_('%d patches imported\n') % len(imported))
 
+def scanmsg(ui, patches, s, m, suppressWarn=False):
+    if m.is_multipart():
+        for a in m.get_payload():
+            scanmsg(ui, patches, s, a, suppressWarn=True)
+    else:
+        a = m.get_payload(decode=True)
+
+        if re_ispatch.search(a):
+            patch = { 'title': s, 'patch': a }
+            ui.status('%s\n' % s)
+            patches.append(patch)
+        else:
+            if not suppressWarn:
+                ui.status('Not a patch: %s\n' % s)
+
 re_ispatch = re.compile(r'^(# HG|diff\s)', re.M)
 
 cmdtable = {}
@@ -81,41 +97,23 @@ def eimport(ui, repo, *patterns, **opts):
         subprocess.call(["osascript", sc, d[1:].replace('/', ':')])
         patterns = os.listdir(d)
 
-    for p in patterns:
+    try:
+        for p in patterns:
+            if d:
+                p = os.path.join(d, p)
 
-        if d:
-            p = os.path.join(d, p)
-
-        try:
-            f = open(p)
-            m = email.message_from_file(f)
-            s = m['subject']
-            if m.is_multipart():
-                for a in m.get_payload():
-                    a = a.get_payload(decode=True)
-                    if re_ispatch.search(a):
-                        break;
-            else:
-                a = m.get_payload(decode=True)
-
-            if re_ispatch.search(a):
-                patch = { 'title': s, 'patch': a }
-                ui.status('%s\n' % s)
-                patches.append(patch)
-            else:
-                ui.status('Not a patch: %s\n' % s)
-
-            f.close()
-
-        except IOError:
-            if f:
+            try:
+                f = open(p)
+                m = email.message_from_file(f)
+                scanmsg(ui, patches, m['subject'], m)
                 f.close()
 
+            except IOError:
+                if f:
+                    f.close()
+    finally:
         if d:
-            os.remove(p)
-
-    if d:
-        os.rmdir(d)
+            shutil.rmtree(d)
 
     if len(patches) > 0:
         allowed = _('[Ny]')
