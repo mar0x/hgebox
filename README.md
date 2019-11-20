@@ -17,6 +17,7 @@ EOF
 ```
 
 Try
+Select email(s) with patches and
 ```
 hg eimport -
 ```
