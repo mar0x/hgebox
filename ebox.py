@@ -78,8 +78,12 @@ re_ispatch = re.compile(r'^(# HG|diff\s)', re.M)
 
 cmdtable = {}
 
-from mercurial import cmdutil
-command = cmdutil.command(cmdtable)
+try:
+    from mercurial import cmdutil
+    command = cmdutil.command(cmdtable)
+except:
+    from mercurial import registrar
+    command = registrar.command(cmdtable)
 
 @command('eimport',
     [],
