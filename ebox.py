@@ -60,6 +60,14 @@ def importpatches(ui, repo, patches):
 
 re_ispatch = re.compile(r'^(# HG|diff\s)', re.M)
 
+cmdtable = {}
+
+from mercurial import cmdutil
+command = cmdutil.command(cmdtable)
+
+@command('eimport',
+    [],
+    _('hg eimport [FILE ...]'))
 def eimport(ui, repo, *patterns, **opts):
     """qimport patches from eml files
     """
@@ -120,15 +128,3 @@ def eimport(ui, repo, *patterns, **opts):
         if r == 1:
             importpatches(ui, repo, patches)
 
-cmdtable = {}
-
-def extsetup():
-    try:
-        mq = extensions.find('mq')
-    except KeyError:
-        return
-
-    cmdtable['eimport'] = (
-        eimport,
-        [],
-        _('hg eimport FILE...'))
