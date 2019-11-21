@@ -6,7 +6,7 @@ This extension allows you to import patches straight from Apple Mail.
 Get
 ---
 ```
-hg clone https://github.com/mar0x/hgebox.git
+git clone https://github.com/mar0x/hgebox.git
 ```
 
 Enable
