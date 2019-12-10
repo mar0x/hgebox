@@ -92,7 +92,7 @@ except:
     from mercurial import registrar
     command = registrar.command(cmdtable)
 
-@command('eimport',
+@command(b'eimport',
     [],
     _('hg eimport [FILE ...]'))
 def eimport(ui, repo, *patterns, **opts):
